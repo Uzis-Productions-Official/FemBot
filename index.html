@@ -1,101 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>FemBot Client</title>
+  <meta charset="UTF-8">
+  <title>Eaglercraft 1.8.8 Client</title>
   <style>
-    body { margin:0; background:#000; }
-    #clientFrame { width:100vw; height:100vh; border:none; }
-
-    #botToggle {
-      position:fixed;
-      bottom:10px; left:10px;
-      padding:10px 16px;
-      background:#ffb6c1;
-      border:none; border-radius:8px;
-      cursor:pointer; font-weight:bold;
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
     }
-
-    #botPanel {
-      position:fixed;
-      bottom:60px; left:10px;
-      background:#ffe4ec;
-      border:2px solid #ffb6c1;
-      border-radius:12px;
-      padding:12px;
-      display:none;
-      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    #clientFrame {
+      border: none;
+      width: 100%;
+      height: 100%;
     }
-    #botPanel button {
-      display:block;
-      margin:6px 0;
-      padding:8px 12px;
-      background:#ffb6c1;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-    #botPanel button:hover { background:#ff9bb0; }
   </style>
 </head>
 <body>
-  <iframe id="clientFrame" src="Release%201.8.8.html"></iframe>
-
-  <button id="botToggle">Bot</button>
-  <div id="botPanel">
-    <button onclick="sendKey('KeyW')">Tap W</button>
-    <button onclick="sendKey('Space')">Tap Space</button>
-    <button onclick="startMineWalk()">Start Walk+Mine</button>
-    <button onclick="stopMineWalk()">Stop</button>
-  </div>
+  <!-- Replace client/Release1.8.8.html with your actual file path -->
+  <iframe id="clientFrame" src="client/Release1.8.8.html"></iframe>
 
   <script>
-    const frame = document.getElementById('clientFrame');
-    const botToggle = document.getElementById('botToggle');
-    const botPanel = document.getElementById('botPanel');
-    let panelOpen = false;
+    // Access iframe for bot injection
+    const frame = document.getElementById("clientFrame");
 
-    botToggle.onclick = () => {
-      panelOpen = !panelOpen;
-      botPanel.style.display = panelOpen ? 'block' : 'none';
-    };
-
-    function sendKey(code) {
-      const keyChar = code.startsWith("Key") ? code.replace("Key","").toLowerCase() : code;
-      const down = new KeyboardEvent('keydown', { code, key: keyChar, bubbles:true });
-      const up   = new KeyboardEvent('keyup',   { code, key: keyChar, bubbles:true });
-
-      console.log("Dispatching keydown:", code, "to iframe");
-      frame.contentWindow.dispatchEvent(down);
-
-      setTimeout(() => {
-        console.log("Dispatching keyup:", code, "to iframe");
-        frame.contentWindow.dispatchEvent(up);
-      }, 100);
-    }
-
-    let walkMining = false;
-
-    function startMineWalk() {
-      if (walkMining) return;
-      walkMining = true;
-      console.log("Starting walk+mine sequence");
-      frame.contentWindow.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyW', key:'w', bubbles:true }));
-      console.log(" -> Sent keydown W");
-      frame.contentWindow.dispatchEvent(new MouseEvent('mousedown', { button:0, bubbles:true }));
-      console.log(" -> Sent mousedown (left click)");
-    }
-
-    function stopMineWalk() {
-      if (!walkMining) return;
-      walkMining = false;
-      console.log("Stopping walk+mine sequence");
-      frame.contentWindow.dispatchEvent(new KeyboardEvent('keyup', { code:'KeyW', key:'w', bubbles:true }));
-      console.log(" -> Sent keyup W");
-      frame.contentWindow.dispatchEvent(new MouseEvent('mouseup', { button:0, bubbles:true }));
-      console.log(" -> Sent mouseup (left click)");
-    }
+    // Example: forward all key presses from outer window to game iframe
+    window.addEventListener("keydown", e => {
+      frame.contentWindow.dispatchEvent(new KeyboardEvent("keydown", e));
+    });
+    window.addEventListener("keyup", e => {
+      frame.contentWindow.dispatchEvent(new KeyboardEvent("keyup", e));
+    });
   </script>
 </body>
 </html>
