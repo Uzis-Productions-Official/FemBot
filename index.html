@@ -2,124 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Eaglercraft 1.8.8 Client</title>
+  <title>Eaglercraft FemBot</title>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: Arial, sans-serif;
-    }
-    #clientFrame {
-      border: none;
-      width: 100%;
-      height: 100%;
-    }
-    #botButton {
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      background: lightpink;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
+    body { margin: 0; background: #f8d7ef; overflow: hidden; }
+    iframe { width: 100vw; height: 100vh; border: none; }
     #botPanel {
       position: fixed;
-      bottom: 60px;
-      left: 15px;
-      width: 220px;
-      background: #ffe4ec;
-      border: 2px solid #f5a9c4;
+      bottom: 10px;
+      left: 10px;
+      background: #ffc0cb;
       border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
       padding: 10px;
-      display: none;
-      z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-    #botPanel h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      color: #c2185b;
+      font-family: sans-serif;
     }
     #botPanel button {
-      width: 100%;
-      margin-top: 5px;
-      padding: 6px;
-      border: none;
-      border-radius: 8px;
-      background: lightpink;
-      font-weight: bold;
+      background: #fff0f5;
+      border: 1px solid #ff69b4;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin: 3px 0;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <iframe id="clientFrame" src="client/eaglercraft.1.8.8.html"></iframe>
+  <iframe id="gameFrame" src="https://68a09ffe1c22b33aa1789a2f--inquisitive-semolina-3eaddf.netlify.app/"></iframe>
 
-  <button id="botButton">Bot</button>
   <div id="botPanel">
-    <h3>FemBot</h3>
-    <button id="testBtn">Test (Mine Wood)</button>
+    <button id="toggleBot">Bot</button>
+    <button id="testBtn">Test</button>
   </div>
 
   <script>
-    const frame = document.getElementById("clientFrame");
-    const botButton = document.getElementById("botButton");
-    const botPanel = document.getElementById("botPanel");
-    const testBtn = document.getElementById("testBtn");
+    const frame = document.getElementById("gameFrame");
 
-    botButton.addEventListener("click", () => {
-      botPanel.style.display = botPanel.style.display === "none" ? "block" : "none";
-    });
+    // Toggle bot placeholder
+    document.getElementById("toggleBot").onclick = () => {
+      alert("FemBot activated (placeholder)");
+    };
 
-    // Forward key events
-    window.addEventListener("keydown", e => {
-      frame.contentWindow.dispatchEvent(new KeyboardEvent("keydown", e));
-    });
-    window.addEventListener("keyup", e => {
-      frame.contentWindow.dispatchEvent(new KeyboardEvent("keyup", e));
-    });
-
-    // FemBot Logic
-    testBtn.addEventListener("click", () => {
-      console.log("FemBot: Scanning for wood...");
-      frame.contentWindow.postMessage({action: "fembot_mineWood"}, "*");
-    });
-
-    // Listen inside iframe
-    window.addEventListener("message", (event) => {
-      if (event.data === "wood_found") {
-        console.log("FemBot: Walking to wood...");
-        simulateWalkAndMine();
+    // Test button tries sending a key press into the game
+    document.getElementById("testBtn").onclick = () => {
+      try {
+        const event = new KeyboardEvent("keydown", { key: "w", code: "KeyW" });
+        frame.contentWindow.dispatchEvent(event);
+        alert("Sent W keypress into game iframe");
+      } catch (e) {
+        alert("Could not inject event. Same-origin issue?");
       }
-    });
-
-    function simulateKey(key, type) {
-      frame.contentWindow.dispatchEvent(new KeyboardEvent(type, { key }));
-    }
-
-    function simulateWalkAndMine() {
-      // Example: walk forward + left click (very primitive)
-      simulateKey("w", "keydown");
-
-      setTimeout(() => {
-        simulateKey("w", "keyup");
-        simulateKey("Control", "keydown"); // left click hold
-      }, 3000);
-
-      setTimeout(() => {
-        simulateKey("Control", "keyup"); // stop mining
-        console.log("FemBot: Done.");
-      }, 6000);
-    }
+    };
   </script>
 </body>
 </html>
