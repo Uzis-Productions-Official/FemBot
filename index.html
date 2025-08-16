@@ -7,21 +7,19 @@
     body { margin:0; background:#000; }
     #clientFrame { width:100vw; height:100vh; border:none; }
 
-    /* Bot toggle button */
     #botToggle {
       position:fixed;
       bottom:10px; left:10px;
       padding:10px 16px;
-      background:#ffb6c1;  /* light pink */
+      background:#ffb6c1;
       border:none; border-radius:8px;
       cursor:pointer; font-weight:bold;
     }
 
-    /* Bot panel */
     #botPanel {
       position:fixed;
       bottom:60px; left:10px;
-      background:#ffe4ec; /* very light pink */
+      background:#ffe4ec;
       border:2px solid #ffb6c1;
       border-radius:12px;
       padding:12px;
@@ -42,7 +40,6 @@
   </style>
 </head>
 <body>
-  <!-- Notice the encoded space: %20 -->
   <iframe id="clientFrame" src="Release%201.8.8.html"></iframe>
 
   <button id="botToggle">Bot</button>
@@ -65,10 +62,17 @@
     };
 
     function sendKey(code) {
-      const down = new KeyboardEvent('keydown', { code, key: code.replace('Key','').toLowerCase() });
-      const up   = new KeyboardEvent('keyup',   { code, key: code.replace('Key','').toLowerCase() });
-      frame.contentWindow.document.dispatchEvent(down);
-      setTimeout(() => frame.contentWindow.document.dispatchEvent(up), 100);
+      const keyChar = code.startsWith("Key") ? code.replace("Key","").toLowerCase() : code;
+      const down = new KeyboardEvent('keydown', { code, key: keyChar, bubbles:true });
+      const up   = new KeyboardEvent('keyup',   { code, key: keyChar, bubbles:true });
+
+      console.log("Dispatching keydown:", code, "to iframe");
+      frame.contentWindow.dispatchEvent(down);
+
+      setTimeout(() => {
+        console.log("Dispatching keyup:", code, "to iframe");
+        frame.contentWindow.dispatchEvent(up);
+      }, 100);
     }
 
     let walkMining = false;
@@ -76,15 +80,21 @@
     function startMineWalk() {
       if (walkMining) return;
       walkMining = true;
-      frame.contentWindow.document.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyW', key:'w' }));
-      frame.contentWindow.document.dispatchEvent(new MouseEvent('mousedown', { button:0, bubbles:true }));
+      console.log("Starting walk+mine sequence");
+      frame.contentWindow.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyW', key:'w', bubbles:true }));
+      console.log(" -> Sent keydown W");
+      frame.contentWindow.dispatchEvent(new MouseEvent('mousedown', { button:0, bubbles:true }));
+      console.log(" -> Sent mousedown (left click)");
     }
 
     function stopMineWalk() {
       if (!walkMining) return;
       walkMining = false;
-      frame.contentWindow.document.dispatchEvent(new KeyboardEvent('keyup', { code:'KeyW', key:'w' }));
-      frame.contentWindow.document.dispatchEvent(new MouseEvent('mouseup', { button:0, bubbles:true }));
+      console.log("Stopping walk+mine sequence");
+      frame.contentWindow.dispatchEvent(new KeyboardEvent('keyup', { code:'KeyW', key:'w', bubbles:true }));
+      console.log(" -> Sent keyup W");
+      frame.contentWindow.dispatchEvent(new MouseEvent('mouseup', { button:0, bubbles:true }));
+      console.log(" -> Sent mouseup (left click)");
     }
   </script>
 </body>
