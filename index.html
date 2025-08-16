@@ -5,39 +5,86 @@
   <title>FemBot Client</title>
   <style>
     body { margin:0; background:#000; }
-    #clientFrame {
-      width:100vw;
-      height:100vh;
-      border:none;
-      display:none;
-    }
-    #toggleBtn {
+    #clientFrame { width:100vw; height:100vh; border:none; }
+
+    /* Bot toggle button */
+    #botToggle {
       position:fixed;
-      bottom:10px;
-      left:10px;
-      padding:8px 14px;
-      background:#222;
-      color:#fff;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
+      bottom:10px; left:10px;
+      padding:10px 16px;
+      background:#ffb6c1;  /* light pink */
+      border:none; border-radius:8px;
+      cursor:pointer; font-weight:bold;
     }
+
+    /* Bot panel */
+    #botPanel {
+      position:fixed;
+      bottom:60px; left:10px;
+      background:#ffe4ec; /* very light pink */
+      border:2px solid #ffb6c1;
+      border-radius:12px;
+      padding:12px;
+      display:none;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    #botPanel button {
+      display:block;
+      margin:6px 0;
+      padding:8px 12px;
+      background:#ffb6c1;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    #botPanel button:hover { background:#ff9bb0; }
   </style>
 </head>
 <body>
-  <button id="toggleBtn">Open FemBot</button>
   <iframe id="clientFrame" src="Release-1.8.8.html"></iframe>
 
-  <script>
-    const btn = document.getElementById('toggleBtn');
-    const frame = document.getElementById('clientFrame');
-    let open = false;
+  <button id="botToggle">Bot</button>
+  <div id="botPanel">
+    <button onclick="sendKey('KeyW')">Tap W</button>
+    <button onclick="sendKey('Space')">Tap Space</button>
+    <button onclick="startMineWalk()">Start Walk+Mine</button>
+    <button onclick="stopMineWalk()">Stop</button>
+  </div>
 
-    btn.onclick = () => {
-      open = !open;
-      frame.style.display = open ? 'block' : 'none';
-      btn.textContent = open ? 'Close FemBot' : 'Open FemBot';
+  <script>
+    const frame = document.getElementById('clientFrame');
+    const botToggle = document.getElementById('botToggle');
+    const botPanel = document.getElementById('botPanel');
+    let panelOpen = false;
+
+    botToggle.onclick = () => {
+      panelOpen = !panelOpen;
+      botPanel.style.display = panelOpen ? 'block' : 'none';
     };
+
+    function sendKey(code) {
+      const down = new KeyboardEvent('keydown', { code, key: code.replace('Key','').toLowerCase() });
+      const up   = new KeyboardEvent('keyup',   { code, key: code.replace('Key','').toLowerCase() });
+      frame.contentWindow.document.dispatchEvent(down);
+      setTimeout(() => frame.contentWindow.document.dispatchEvent(up), 100);
+    }
+
+    let walkMining = false;
+
+    function startMineWalk() {
+      if (walkMining) return;
+      walkMining = true;
+      frame.contentWindow.document.dispatchEvent(new KeyboardEvent('keydown', { code:'KeyW', key:'w' }));
+      frame.contentWindow.document.dispatchEvent(new MouseEvent('mousedown', { button:0, bubbles:true }));
+    }
+
+    function stopMineWalk() {
+      if (!walkMining) return;
+      walkMining = false;
+      frame.contentWindow.document.dispatchEvent(new KeyboardEvent('keyup', { code:'KeyW', key:'w' }));
+      frame.contentWindow.document.dispatchEvent(new MouseEvent('mouseup', { button:0, bubbles:true }));
+    }
   </script>
 </body>
 </html>
